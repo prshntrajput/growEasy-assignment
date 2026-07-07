@@ -9,3 +9,23 @@ export interface ApiErrorResponse {
   message: string;
   details?: unknown;
 }
+
+export interface ImportResultSummary {
+  imported: import('@/schemas/crm-record.schema').CrmRecord[];
+  skipped: SkippedRecord[];
+  totalImported: number;
+  totalSkipped: number;
+}
+
+export interface SkippedRecord {
+  originalRow: Record<string, unknown>;
+  reason: string;
+}
+
+export interface JobStatus {
+  jobId: string;
+  status: 'processing' | 'done' | 'failed';
+  progress: number;
+  result?: ImportResultSummary;
+  error?: string;
+}

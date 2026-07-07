@@ -9,7 +9,9 @@ export const errorMiddleware = (
   _next: NextFunction
 ): void => {
   if (err instanceof AppError) {
-    console.error(`[AppError] ${req.method} ${req.originalUrl} -> ${err.statusCode}: ${err.message}`);
+    console.error(
+      `[AppError] ${req.method} ${req.originalUrl} -> ${err.statusCode}: ${err.message}`
+    );
     sendError(res, err.message, err.statusCode, err.details);
     return;
   }

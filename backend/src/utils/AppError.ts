@@ -20,7 +20,10 @@ export class AppError extends Error {
     return new AppError(message, 413);
   }
 
-  static unprocessableAI(message = 'AI returned an invalid or unprocessable response', details?: unknown) {
+  static unprocessableAI(
+    message = 'AI returned an invalid or unprocessable response',
+    details?: unknown
+  ) {
     return new AppError(message, 422, details);
   }
 
