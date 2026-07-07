@@ -26,6 +26,8 @@ export interface JobStatus {
   jobId: string;
   status: 'processing' | 'done' | 'failed';
   progress: number;
+  totalBatches?: number;
+  completedBatches?: number;
   result?: ImportResultSummary;
   error?: string;
 }
