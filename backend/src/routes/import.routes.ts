@@ -8,10 +8,7 @@ const router = Router();
 
 router.post('/csv/parse', csvUploadMiddleware, ImportController.parseCsvFile);
 
-router.post(
-  '/import',
-  validate(ImportRequestSchema),
-  ImportController.confirmImport
-);
+router.post('/import', validate(ImportRequestSchema), ImportController.confirmImport);
 
+router.get('/import/:jobId/status', ImportController.getJobStatus);
 export default router;

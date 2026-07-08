@@ -5,7 +5,7 @@ const requiredEnvVars = ['GEMINI_API_KEY'] as const;
 
 for (const key of requiredEnvVars) {
   if (!process.env[key]) {
-    console.warn(`Warning: Missing environment variable ${key}`);
+    console.warn(`  Warning: Missing environment variable ${key}`);
   }
 }
 
@@ -14,5 +14,8 @@ export const env = {
   NODE_ENV: process.env.NODE_ENV || 'development',
   GEMINI_API_KEY: process.env.GEMINI_API_KEY || '',
   FRONTEND_URL: process.env.FRONTEND_URL || 'http://localhost:3000',
+  ALLOWED_ORIGINS: (process.env.ALLOWED_ORIGINS || 'http://localhost:3000')
+    .split(',')
+    .map((origin) => origin.trim()),
   INNGEST_DEV: process.env.INNGEST_DEV === '1',
 };

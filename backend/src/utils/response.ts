@@ -18,7 +18,11 @@ export const sendSuccess = <T>(
   statusCode = 200,
   message?: string
 ): Response<SuccessPayload<T>> => {
-  return res.status(statusCode).json({ success: true, data, message });
+  return res.status(statusCode).json({
+    success: true,
+    data,
+    message,
+  });
 };
 
 export const sendError = (
@@ -27,5 +31,9 @@ export const sendError = (
   statusCode = 500,
   details?: unknown
 ): Response<ErrorPayload> => {
-  return res.status(statusCode).json({ success: false, message, details });
+  return res.status(statusCode).json({
+    success: false,
+    message,
+    details,
+  });
 };

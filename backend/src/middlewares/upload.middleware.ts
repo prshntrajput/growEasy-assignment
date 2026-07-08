@@ -12,8 +12,7 @@ const fileFilter = (
 ): void => {
   const hasCsvExtension = file.originalname.toLowerCase().endsWith('.csv');
   const hasCsvMimetype =
-    file.mimetype === 'text/csv' ||
-    file.mimetype === 'application/vnd.ms-excel';
+    file.mimetype === 'text/csv' || file.mimetype === 'application/vnd.ms-excel';
 
   if (!hasCsvExtension && !hasCsvMimetype) {
     cb(new Error('Only CSV files are allowed'));
@@ -29,11 +28,7 @@ const upload = multer({
   limits: { fileSize: MAX_FILE_SIZE_BYTES },
 });
 
-export const csvUploadMiddleware = (
-  req: Request,
-  res: Response,
-  next: NextFunction
-): void => {
+export const csvUploadMiddleware = (req: Request, res: Response, next: NextFunction): void => {
   upload.single('file')(req, res, (err) => {
     if (err instanceof multer.MulterError && err.code === 'LIMIT_FILE_SIZE') {
       next(AppError.payloadTooLarge());

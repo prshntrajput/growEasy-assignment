@@ -23,7 +23,9 @@ export class ResultAggregatorService {
           return;
         }
 
-        const validation = CrmRecordSchema.safeParse(crmFields);
+        const normalizedFields = this.applyFallbacks(crmFields);
+
+        const validation = CrmRecordSchema.safeParse(normalizedFields);
         if (!validation.success) {
           skipped.push({
             originalRow: originalRows[batchIdx]?.[rowIdx] ?? {},
@@ -42,6 +44,16 @@ export class ResultAggregatorService {
       totalImported: imported.length,
       totalSkipped: skipped.length,
     };
+  }
+
+  private applyFallbacks(fields: Record<string, unknown>): Record<string, unknown> {
+    const normalized = { ...fields };
+
+    if (!normalized.created_at || normalized.created_at === '') {
+      normalized.created_at = new Date().toISOString();
+    }
+
+    return normalized;
   }
 }
 

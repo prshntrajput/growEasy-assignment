@@ -38,9 +38,7 @@ export class CsvParserService {
   }
 
   public normalizeRows(rawRows: RawCsvRow[]): RawCsvRow[] {
-    return rawRows
-      .map((row) => this.stripEmptyValues(row))
-      .filter((row) => !this.isRowEmpty(row));
+    return rawRows.map((row) => this.stripEmptyValues(row)).filter((row) => !this.isRowEmpty(row));
   }
 
   private stripEmptyValues(row: RawCsvRow): RawCsvRow {
