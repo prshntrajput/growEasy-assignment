@@ -23,9 +23,12 @@ export class ResultAggregatorService {
           return;
         }
 
-        const normalizedFields = this.applyFallbacks(crmFields);
+        const normalizedFields = this.sanitizePlainTextFields(
+          this.applyFallbacks(crmFields)
+        );
 
         const validation = CrmRecordSchema.safeParse(normalizedFields);
+
         if (!validation.success) {
           skipped.push({
             originalRow: originalRows[batchIdx]?.[rowIdx] ?? {},
@@ -51,6 +54,37 @@ export class ResultAggregatorService {
 
     if (!normalized.created_at || normalized.created_at === '') {
       normalized.created_at = new Date().toISOString();
+    }
+
+    return normalized;
+  }
+
+  private sanitizePlainTextFields(
+    fields: Record<string, unknown>
+  ): Record<string, unknown> {
+    const normalized = { ...fields };
+
+    const plainTextKeys = [
+      'crm_note',
+      'description',
+      'name',
+      'company',
+      'city',
+      'state',
+      'country',
+      'lead_owner',
+    ];
+
+    for (const key of plainTextKeys) {
+      const value = normalized[key];
+
+      if (typeof value === 'string') {
+        normalized[key] = value
+          .replace(/\[([^\]]+)\]\(mailto:[^)]+\)/gi, '$1')
+          .replace(/\[([^\]]+)\]\((https?:\/\/[^)]+)\)/gi, '$1')
+          .replace(/\s+/g, ' ')
+          .trim();
+      }
     }
 
     return normalized;

@@ -37,9 +37,10 @@ export function CsvPreviewTable({
             value === null || value === undefined || value === ''
               ? '—'
               : String(value);
+
           return (
             <span
-              className={display === '—' ? 'text-muted-foreground italic' : ''}
+              className={display === '—' ? 'italic text-muted-foreground' : ''}
               title={display}
             >
               {display}
@@ -77,6 +78,7 @@ export function CsvPreviewTable({
               </tr>
             ))}
           </thead>
+
           <tbody>
             {table.getRowModel().rows.map((row, idx) => (
               <tr
@@ -96,10 +98,11 @@ export function CsvPreviewTable({
           </tbody>
         </table>
       </div>
+
       {rows.length > maxPreviewRows && (
         <p className="text-xs text-muted-foreground">
-          Showing first {maxPreviewRows} of {rows.length} rows. All{' '}
-          {rows.length} rows will be imported.
+          Large file detected. Showing first {maxPreviewRows} preview rows out
+          of {rows.length}. The full dataset will still be sent for import.
         </p>
       )}
     </div>

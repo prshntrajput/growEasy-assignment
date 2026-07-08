@@ -1,7 +1,11 @@
 import { getGeminiModel } from '@/config/gemini.client';
 import { promptBuilderService } from '@/services/prompt-builder.service';
 import { RawCsvRow } from '@/schemas/raw-csv-row.schema';
-import { CrmRecord, CrmStatusEnum, DataSourceEnum } from '@/schemas/crm-record.schema';
+import {
+  CrmRecord,
+  CrmStatusEnum,
+  DataSourceEnum,
+} from '@/schemas/crm-record.schema';
 import { AppError } from '@/utils/AppError';
 
 export interface AiExtractedRecord extends CrmRecord {
@@ -16,8 +20,22 @@ interface GeminiExtractionResponse {
 const VALID_CRM_STATUSES = new Set<string>(CrmStatusEnum.options);
 const VALID_DATA_SOURCES = new Set<string>(DataSourceEnum.options);
 
+const MEANINGLESS_CRM_STATUS_VALUES = new Set<string>([
+  'TRUE',
+  'FALSE',
+  '1',
+  '0',
+  'NULL',
+  'N/A',
+  'NA',
+  'UNKNOWN',
+]);
+
 export class AiExtractionService {
-  public async extractBatch(headers: string[], rows: RawCsvRow[]): Promise<AiExtractedRecord[]> {
+  public async extractBatch(
+    headers: string[],
+    rows: RawCsvRow[]
+  ): Promise<AiExtractedRecord[]> {
     const model = getGeminiModel();
     const prompt = promptBuilderService.buildExtractionPrompt(headers, rows);
 
@@ -28,7 +46,9 @@ export class AiExtractionService {
       rawText = result.response.text();
     } catch (err) {
       throw AppError.aiProviderError(
-        `Gemini API request failed: ${err instanceof Error ? err.message : 'Unknown error'}`
+        `Gemini API request failed: ${
+          err instanceof Error ? err.message : 'Unknown error'
+        }`
       );
     }
 
@@ -49,26 +69,54 @@ export class AiExtractionService {
     }
 
     if (parsed.records.length !== rows.length) {
-      console.warn(`Batch mismatch: expected ${rows.length} records, got ${parsed.records.length}`);
+      console.warn(
+        `Batch mismatch: expected ${rows.length} records, got ${parsed.records.length}`
+      );
     }
 
     return parsed.records.map((record) => this.sanitizeEnumFields(record));
   }
 
-  private sanitizeEnumFields(record: AiExtractedRecord): AiExtractedRecord {
+  public sanitizeEnumFields(record: AiExtractedRecord): AiExtractedRecord {
     const sanitized: AiExtractedRecord = { ...record };
 
-    if (sanitized.crm_status && !VALID_CRM_STATUSES.has(sanitized.crm_status)) {
-      console.warn(`Invalid crm_status "${sanitized.crm_status}" received, clearing to blank`);
-      sanitized.crm_status = '';
-    }
+    sanitized.crm_status = this.normalizeCrmStatus(
+      sanitized.crm_status
+    ) as AiExtractedRecord['crm_status'];
 
-    if (sanitized.data_source && !VALID_DATA_SOURCES.has(sanitized.data_source)) {
-      console.warn(`Invalid data_source "${sanitized.data_source}" received, clearing to blank`);
-      sanitized.data_source = '';
-    }
+    sanitized.data_source = this.normalizeDataSource(
+      sanitized.data_source
+    ) as AiExtractedRecord['data_source'];
 
     return sanitized;
+  }
+
+  public normalizeCrmStatus(value: string | undefined): string {
+    if (!value) return '';
+
+    const normalized = value.trim().toUpperCase();
+
+    if (VALID_CRM_STATUSES.has(normalized)) {
+      return normalized;
+    }
+
+    if (MEANINGLESS_CRM_STATUS_VALUES.has(normalized)) {
+      return '';
+    }
+
+    return '';
+  }
+
+  public normalizeDataSource(value: string | undefined): string {
+    if (!value) return '';
+
+    const normalized = value.trim().toLowerCase();
+
+    if (VALID_DATA_SOURCES.has(normalized)) {
+      return normalized;
+    }
+
+    return '';
   }
 }
 
