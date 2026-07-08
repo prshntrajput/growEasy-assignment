@@ -1,13 +1,23 @@
 'use client';
 
-import { useCallback, useRef, useState } from 'react';
-import { confirmImport, getJobStatus, ApiError, JobStatus } from '@/lib/api.client';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import {
+  confirmImport,
+  getJobStatus,
+  ApiError,
+  JobStatus,
+} from '@/lib/api.client';
 import { ParsedCsv } from '@/lib/schemas/raw-csv-row.schema';
 
 const POLL_INTERVAL_MS = 1500;
 const MAX_POLL_ATTEMPTS = 120;
 
-export type ImportPhase = 'idle' | 'submitting' | 'processing' | 'done' | 'error';
+export type ImportPhase =
+  | 'idle'
+  | 'submitting'
+  | 'processing'
+  | 'done'
+  | 'error';
 
 interface UseImportJobState {
   phase: ImportPhase;
@@ -25,6 +35,7 @@ export function useImportJob() {
   const pollTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const lastParsedCsvRef = useRef<ParsedCsv | null>(null);
   const attemptsRef = useRef(0);
+  const pollRef = useRef<((jobId: string) => Promise<void>) | null>(null);
 
   const clearPolling = useCallback(() => {
     if (pollTimeoutRef.current) {
@@ -34,14 +45,16 @@ export function useImportJob() {
   }, []);
 
   const poll = useCallback(
-    async (jobId: string) => {
+    async (jobId: string): Promise<void> => {
       attemptsRef.current += 1;
 
       if (attemptsRef.current > MAX_POLL_ATTEMPTS) {
+        clearPolling();
         setState({
           phase: 'error',
           jobStatus: null,
-          errorMessage: 'Import is taking too long. Please try again or check back later.',
+          errorMessage:
+            'Import is taking too long. Please try again or check back later.',
         });
         return;
       }
@@ -50,22 +63,30 @@ export function useImportJob() {
         const status = await getJobStatus(jobId);
 
         if (status.status === 'done') {
+          clearPolling();
           setState({ phase: 'done', jobStatus: status, errorMessage: null });
           return;
         }
 
         if (status.status === 'failed') {
+          clearPolling();
           setState({
             phase: 'error',
             jobStatus: status,
-            errorMessage: status.error || 'AI processing failed for this import job.',
+            errorMessage:
+              status.error || 'AI processing failed for this import job.',
           });
           return;
         }
 
         setState({ phase: 'processing', jobStatus: status, errorMessage: null });
-        pollTimeoutRef.current = setTimeout(() => poll(jobId), POLL_INTERVAL_MS);
+
+        pollTimeoutRef.current = setTimeout(() => {
+          void pollRef.current?.(jobId);
+        }, POLL_INTERVAL_MS);
       } catch (err) {
+        clearPolling();
+
         const message =
           err instanceof ApiError
             ? err.statusCode === 0
@@ -76,18 +97,30 @@ export function useImportJob() {
         setState({ phase: 'error', jobStatus: null, errorMessage: message });
       }
     },
-    []
+    [clearPolling]
   );
+
+  useEffect(() => {
+    pollRef.current = poll;
+  }, [poll]);
+
+  useEffect(() => {
+    return () => {
+      clearPolling();
+    };
+  }, [clearPolling]);
 
   const startImport = useCallback(
     async (parsedCsv: ParsedCsv) => {
       lastParsedCsvRef.current = parsedCsv;
       attemptsRef.current = 0;
       clearPolling();
+
       setState({ phase: 'submitting', jobStatus: null, errorMessage: null });
 
       try {
         const { jobId, totalBatches } = await confirmImport(parsedCsv);
+
         setState({
           phase: 'processing',
           jobStatus: {
@@ -99,8 +132,13 @@ export function useImportJob() {
           },
           errorMessage: null,
         });
-        pollTimeoutRef.current = setTimeout(() => poll(jobId), POLL_INTERVAL_MS);
+
+        pollTimeoutRef.current = setTimeout(() => {
+          void pollRef.current?.(jobId);
+        }, POLL_INTERVAL_MS);
       } catch (err) {
+        clearPolling();
+
         const message =
           err instanceof ApiError
             ? err.statusCode === 0
@@ -111,12 +149,12 @@ export function useImportJob() {
         setState({ phase: 'error', jobStatus: null, errorMessage: message });
       }
     },
-    [clearPolling, poll]
+    [clearPolling]
   );
 
   const retry = useCallback(() => {
     if (lastParsedCsvRef.current) {
-      startImport(lastParsedCsvRef.current);
+      void startImport(lastParsedCsvRef.current);
     }
   }, [startImport]);
 

@@ -44,12 +44,18 @@ export function ImportedRecordsTable({ records }: ImportedRecordsTableProps) {
         </thead>
         <tbody>
           {records.map((record, idx) => (
-            <tr key={idx} className={idx % 2 === 0 ? 'bg-background' : 'bg-muted/30'}>
+            <tr
+              key={idx}
+              className={idx % 2 === 0 ? 'bg-background' : 'bg-muted/30'}
+            >
               {CRM_COLUMNS.map((col) => {
                 const value = record[col.key];
                 if (col.key === 'crm_status' && value) {
                   return (
-                    <td key={col.key} className="whitespace-nowrap border-b px-4 py-2">
+                    <td
+                      key={col.key}
+                      className="whitespace-nowrap border-b px-4 py-2"
+                    >
                       <Badge variant="secondary">{String(value)}</Badge>
                     </td>
                   );
@@ -60,7 +66,11 @@ export function ImportedRecordsTable({ records }: ImportedRecordsTableProps) {
                     className="max-w-[220px] truncate whitespace-nowrap border-b px-4 py-2 text-foreground/90"
                     title={value ? String(value) : ''}
                   >
-                    {value ? String(value) : <span className="italic text-muted-foreground">—</span>}
+                    {value ? (
+                      String(value)
+                    ) : (
+                      <span className="italic text-muted-foreground">—</span>
+                    )}
                   </td>
                 );
               })}

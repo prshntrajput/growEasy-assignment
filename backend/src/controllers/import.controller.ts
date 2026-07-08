@@ -8,16 +8,10 @@ import { inngest } from '@/inngest/client';
 import { ImportRequestSchema } from '@/schemas/batch-request.schema';
 
 export class ImportController {
-  public static async parseCsvFile(
-    req: Request,
-    res: Response,
-    next: NextFunction
-  ): Promise<void> {
+  public static async parseCsvFile(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
       if (!req.file) {
-        throw AppError.badRequest(
-          'No file uploaded. Field name must be "file".'
-        );
+        throw AppError.badRequest('No file uploaded. Field name must be "file".');
       }
 
       const parsedCsv = csvParserService.parseBuffer(req.file.buffer);
@@ -43,10 +37,7 @@ export class ImportController {
         throw AppError.badRequest('No valid rows found after normalization');
       }
 
-      const { jobId, batches } = batchService.createBatches(
-        headers,
-        normalizedRows
-      );
+      const { jobId, batches } = batchService.createBatches(headers, normalizedRows);
 
       jobStoreService.create(jobId, batches.length);
 
@@ -74,18 +65,15 @@ export class ImportController {
     }
   }
 
-  public static async getJobStatus(
-    req: Request,
-    res: Response,
-    next: NextFunction
-  ): Promise<void> {
+  public static async getJobStatus(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
-      const { jobId } = req.params;
+      const rawJobId = req.params.jobId;
 
-      if (!jobId) {
+      if (!rawJobId || Array.isArray(rawJobId)) {
         throw AppError.badRequest('jobId parameter is required');
       }
 
+      const jobId = rawJobId;
       const job = jobStoreService.get(jobId);
 
       if (!job) {

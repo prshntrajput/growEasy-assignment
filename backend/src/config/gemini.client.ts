@@ -40,7 +40,7 @@ export const CRM_RECORD_RESPONSE_SCHEMA = {
     },
   },
   required: ['records'],
-} as const;
+};
 
 export const getGeminiModel = (modelName = 'gemini-2.5-flash') => {
   return genAI.getGenerativeModel({

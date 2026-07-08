@@ -4,7 +4,12 @@ import { getGeminiModel } from '@/config/gemini.client';
 
 export class HealthController {
   static ping(_req: Request, res: Response): void {
-    sendSuccess(res, { status: 'ok', timestamp: new Date().toISOString() }, 200, 'Server is healthy');
+    sendSuccess(
+      res,
+      { status: 'ok', timestamp: new Date().toISOString() },
+      200,
+      'Server is healthy'
+    );
   }
 
   static async testGemini(_req: Request, res: Response, next: NextFunction): Promise<void> {

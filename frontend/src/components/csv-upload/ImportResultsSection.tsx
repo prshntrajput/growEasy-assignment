@@ -17,8 +17,12 @@ export function ImportResultsSection({ result }: ImportResultsSectionProps) {
       />
       <Tabs defaultValue="imported">
         <TabsList>
-          <TabsTrigger value="imported">Imported ({result.totalImported})</TabsTrigger>
-          <TabsTrigger value="skipped">Skipped ({result.totalSkipped})</TabsTrigger>
+          <TabsTrigger value="imported">
+            Imported ({result.totalImported})
+          </TabsTrigger>
+          <TabsTrigger value="skipped">
+            Skipped ({result.totalSkipped})
+          </TabsTrigger>
         </TabsList>
         <TabsContent value="imported" className="mt-3">
           <ImportedRecordsTable records={result.imported} />

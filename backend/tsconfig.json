@@ -18,6 +18,13 @@
     "noUnusedParameters": true,
     "noImplicitReturns": true
   },
+    "tsc-alias": {
+    "replacers": {
+      "base-url": {
+        "enabled": false
+      }
+    }
+  },
   "include": ["src/**/*.ts"],
   "exclude": ["node_modules", "dist"]
 }

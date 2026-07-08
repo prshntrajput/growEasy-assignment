@@ -4,9 +4,7 @@ import { AppError } from '@/utils/AppError';
 
 describe('CsvParserService', () => {
   it('parses a valid CSV buffer successfully', () => {
-    const buffer = Buffer.from(
-      'Full Name,Email,Phone\nJane Doe,jane@example.com,9876543210'
-    );
+    const buffer = Buffer.from('Full Name,Email,Phone\nJane Doe,jane@example.com,9876543210');
 
     const result = csvParserService.parseBuffer(buffer);
 

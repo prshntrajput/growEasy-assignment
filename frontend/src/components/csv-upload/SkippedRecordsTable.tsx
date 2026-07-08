@@ -28,7 +28,10 @@ export function SkippedRecordsTable({ records }: SkippedRecordsTableProps) {
         </thead>
         <tbody>
           {records.map((record, idx) => (
-            <tr key={idx} className={idx % 2 === 0 ? 'bg-background' : 'bg-muted/30'}>
+            <tr
+              key={idx}
+              className={idx % 2 === 0 ? 'bg-background' : 'bg-muted/30'}
+            >
               <td className="max-w-[420px] truncate whitespace-nowrap border-b px-4 py-2 text-foreground/90">
                 {JSON.stringify(record.originalRow)}
               </td>

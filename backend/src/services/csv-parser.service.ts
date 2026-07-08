@@ -31,15 +31,11 @@ export class CsvParserService {
 
     if (parsed.errors.length > 0) {
       const critical = parsed.errors.filter(
-        (e) =>
-          e.code !== 'UndetectableDelimiter' &&
-          e.type !== 'FieldMismatch'
+        (e) => e.code !== 'UndetectableDelimiter' && e.type !== 'FieldMismatch'
       );
 
       if (critical.length > 0) {
-        throw AppError.badRequest(
-          `CSV parsing failed: ${critical[0].message}`
-        );
+        throw AppError.badRequest(`CSV parsing failed: ${critical[0].message}`);
       }
     }
 
@@ -52,18 +48,14 @@ export class CsvParserService {
     const rows = this.normalizeRows(parsed.data);
 
     if (rows.length === 0) {
-      throw AppError.badRequest(
-        'CSV file contains headers but no valid data rows'
-      );
+      throw AppError.badRequest('CSV file contains headers but no valid data rows');
     }
 
     return { headers, rows };
   }
 
   public normalizeRows(rawRows: RawCsvRow[]): RawCsvRow[] {
-    return rawRows
-      .map((row) => this.stripEmptyValues(row))
-      .filter((row) => !this.isRowEmpty(row));
+    return rawRows.map((row) => this.stripEmptyValues(row)).filter((row) => !this.isRowEmpty(row));
   }
 
   private extractNormalizedHeaders(csvText: string): string[] {
@@ -75,15 +67,11 @@ export class CsvParserService {
 
     if (headerPreview.errors.length > 0) {
       const critical = headerPreview.errors.filter(
-        (e) =>
-          e.code !== 'UndetectableDelimiter' &&
-          e.type !== 'FieldMismatch'
+        (e) => e.code !== 'UndetectableDelimiter' && e.type !== 'FieldMismatch'
       );
 
       if (critical.length > 0) {
-        throw AppError.badRequest(
-          `CSV parsing failed: ${critical[0].message}`
-        );
+        throw AppError.badRequest(`CSV parsing failed: ${critical[0].message}`);
       }
     }
 
@@ -93,9 +81,7 @@ export class CsvParserService {
       return [];
     }
 
-    return firstRow.map((header, index) =>
-      this.normalizeHeader(String(header ?? ''), index)
-    );
+    return firstRow.map((header, index) => this.normalizeHeader(String(header ?? ''), index));
   }
 
   private stripEmptyValues(row: RawCsvRow): RawCsvRow {
@@ -132,9 +118,7 @@ export class CsvParserService {
     }
 
     if (duplicates.length > 0) {
-      throw AppError.badRequest(
-        `CSV contains duplicate headers: ${duplicates.join(', ')}`
-      );
+      throw AppError.badRequest(`CSV contains duplicate headers: ${duplicates.join(', ')}`);
     }
   }
 }

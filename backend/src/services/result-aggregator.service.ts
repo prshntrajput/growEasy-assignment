@@ -23,9 +23,7 @@ export class ResultAggregatorService {
           return;
         }
 
-        const normalizedFields = this.sanitizePlainTextFields(
-          this.applyFallbacks(crmFields)
-        );
+        const normalizedFields = this.sanitizePlainTextFields(this.applyFallbacks(crmFields));
 
         const validation = CrmRecordSchema.safeParse(normalizedFields);
 
@@ -59,9 +57,7 @@ export class ResultAggregatorService {
     return normalized;
   }
 
-  private sanitizePlainTextFields(
-    fields: Record<string, unknown>
-  ): Record<string, unknown> {
+  private sanitizePlainTextFields(fields: Record<string, unknown>): Record<string, unknown> {
     const normalized = { ...fields };
 
     const plainTextKeys = [
