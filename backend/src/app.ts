@@ -27,10 +27,10 @@ app.use(
   })
 );
 
-applySecurityMiddleware(app);
-
 app.use('/api/inngest', express.raw({ type: '*/*' }));
 app.use('/api/inngest', serve({ client: inngest, functions }));
+
+applySecurityMiddleware(app);
 
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
