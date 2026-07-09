@@ -8,7 +8,6 @@ import healthRoutes from '@/routes/health.routes';
 import importRoutes from '@/routes/import.routes';
 import { errorMiddleware } from '@/middlewares/error.middleware';
 import { notFoundMiddleware } from '@/middlewares/notFound.middleware';
-import { applySecurityMiddleware } from '@/middlewares/security.middleware';
 import { AppError } from '@/utils/AppError';
 
 const app: Application = express();
@@ -29,8 +28,6 @@ app.use(
 
 app.use('/api/inngest', express.raw({ type: '*/*' }));
 app.use('/api/inngest', serve({ client: inngest, functions }));
-
-applySecurityMiddleware(app);
 
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
