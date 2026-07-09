@@ -18,6 +18,18 @@ const CRM_COLUMNS: { key: keyof CrmRecord; label: string }[] = [
   { key: 'created_at', label: 'Created At' },
 ];
 
+function sanitizeDisplayText(value: unknown): string {
+  if (value === null || value === undefined || value === '') {
+    return '';
+  }
+
+  return String(value)
+    .replace(/\[([^\]]+)\]\(mailto:[^)]+\)/gi, '$1')
+    .replace(/\[([^\]]+)\]\((https?:\/\/[^)]+)\)/gi, '$1')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
 export function ImportedRecordsTable({ records }: ImportedRecordsTableProps) {
   if (records.length === 0) {
     return (
@@ -50,24 +62,27 @@ export function ImportedRecordsTable({ records }: ImportedRecordsTableProps) {
             >
               {CRM_COLUMNS.map((col) => {
                 const value = record[col.key];
-                if (col.key === 'crm_status' && value) {
+                const displayValue = sanitizeDisplayText(value);
+
+                if (col.key === 'crm_status' && displayValue) {
                   return (
                     <td
                       key={col.key}
                       className="whitespace-nowrap border-b px-4 py-2"
                     >
-                      <Badge variant="secondary">{String(value)}</Badge>
+                      <Badge variant="secondary">{displayValue}</Badge>
                     </td>
                   );
                 }
+
                 return (
                   <td
                     key={col.key}
                     className="max-w-[220px] truncate whitespace-nowrap border-b px-4 py-2 text-foreground/90"
-                    title={value ? String(value) : ''}
+                    title={displayValue}
                   >
-                    {value ? (
-                      String(value)
+                    {displayValue ? (
+                      displayValue
                     ) : (
                       <span className="italic text-muted-foreground">—</span>
                     )}

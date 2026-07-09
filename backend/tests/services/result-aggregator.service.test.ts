@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import { resultAggregatorService } from '@/services/result-aggregator.service';
-import { AiExtractedRecord } from '@/services/ai-extraction.service';
+import { resultAggregatorService } from '../../src/services/result-aggregator.service';
+import { AiExtractedRecord } from '../../src/services/ai-extraction.service';
 
 describe('ResultAggregatorService', () => {
   it('skips records flagged by AI and imports valid records', () => {

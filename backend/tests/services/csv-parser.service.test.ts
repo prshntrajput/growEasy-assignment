@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import { csvParserService } from '@/services/csv-parser.service';
-import { AppError } from '@/utils/AppError';
+import { csvParserService } from '../../src/services/csv-parser.service';
+import { AppError } from '../../src/utils/AppError';
 
 describe('CsvParserService', () => {
   it('parses a valid CSV buffer successfully', () => {

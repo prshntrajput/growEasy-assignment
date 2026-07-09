@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { aiExtractionService } from '@/services/ai-extraction.service';
+import { aiExtractionService } from '../../src/services/ai-extraction.service';
 
 describe('AiExtractionService sanitization', () => {
   it('normalizes invalid crm_status values to blank', () => {
