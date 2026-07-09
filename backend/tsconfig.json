@@ -18,13 +18,13 @@
     "noUnusedParameters": true,
     "noImplicitReturns": true
   },
-    "tsc-alias": {
+  "tsc-alias": {
     "replacers": {
       "base-url": {
         "enabled": false
       }
     }
   },
-  "include": ["src/**/*.ts", "tests/services/result-aggregator.service.test.ts", "tests/services/result-aggregator.service.test.ts", "tests/services/csv-parser.service.test.ts", "tests/services/ai-extraction.service.test.ts"],
-  "exclude": ["node_modules", "dist"]
+  "include": ["src/**/*.ts"],
+  "exclude": ["node_modules", "dist", "tests"]
 }
