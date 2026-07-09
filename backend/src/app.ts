@@ -26,22 +26,36 @@ app.use(
   })
 );
 
-app.use('/api/inngest', express.raw({ type: '*/*' }));
-app.use('/api/inngest', serve({ client: inngest, functions }));
+// Inngest route
 
+app.use('/api/inngest', express.raw({ type: '*/*' }));
+app.use(
+  '/api/inngest',
+  serve({
+    client: inngest,
+    functions,
+  })
+);
+
+// Normal API middleware
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
+// Routes
 app.use('/api/health', healthRoutes);
 app.use('/api', importRoutes);
 
+// Root route
 app.get('/', (_req, res) => {
   res.status(200).json({
     success: true,
-    data: { message: 'GrowEasy CSV Importer API is running. See /api/health/ping' },
+    data: {
+      message: 'GrowEasy CSV Importer API is running. See /api/health/ping',
+    },
   });
 });
 
+// 404 + error handling
 app.use(notFoundMiddleware);
 app.use(errorMiddleware);
 
