@@ -26,9 +26,9 @@ app.use(
   })
 );
 
-// Inngest route
+app.use(express.json({ limit: '10mb' }));
+app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
-app.use('/api/inngest', express.raw({ type: '*/*' }));
 app.use(
   '/api/inngest',
   serve({
@@ -37,15 +37,9 @@ app.use(
   })
 );
 
-// Normal API middleware
-app.use(express.json({ limit: '10mb' }));
-app.use(express.urlencoded({ extended: true, limit: '10mb' }));
-
-// Routes
 app.use('/api/health', healthRoutes);
 app.use('/api', importRoutes);
 
-// Root route
 app.get('/', (_req, res) => {
   res.status(200).json({
     success: true,
@@ -55,7 +49,6 @@ app.get('/', (_req, res) => {
   });
 });
 
-// 404 + error handling
 app.use(notFoundMiddleware);
 app.use(errorMiddleware);
 
